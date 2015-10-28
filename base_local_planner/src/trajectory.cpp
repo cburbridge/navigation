@@ -40,7 +40,7 @@ namespace base_local_planner {
   }
 
   Trajectory::Trajectory(double xv, double yv, double thetav, double time_delta, unsigned int num_pts)
-    : xv_(xv), yv_(yv), thetav_(thetav), cost_(-1.0), time_delta_(time_delta), x_pts_(num_pts), y_pts_(num_pts), th_pts_(num_pts)
+    : xv_(xv), yv_(yv), thetav_(thetav), cost_(-1.0), time_delta_(time_delta), costs_(12), x_pts_(num_pts), y_pts_(num_pts), th_pts_(num_pts)
   {
   }
 

@@ -61,6 +61,8 @@
 #include <base_local_planner/simple_scored_sampling_planner.h>
 
 #include <nav_msgs/Path.h>
+#include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/MultiArrayDimension.h>
 
 namespace dwa_local_planner {
   /**
@@ -160,8 +162,11 @@ namespace dwa_local_planner {
       boost::mutex configuration_mutex_;
       pcl::PointCloud<base_local_planner::MapGridCostPoint>* traj_cloud_;
       pcl_ros::Publisher<base_local_planner::MapGridCostPoint> traj_cloud_pub_;
+      ros::Publisher costs_pub_;
+
       bool publish_cost_grid_pc_; ///< @brief Whether or not to build and publish a PointCloud
       bool publish_traj_pc_;
+      bool publish_sample_costs_;
 
       double cheat_factor_;
 

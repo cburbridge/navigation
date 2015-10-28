@@ -61,6 +61,8 @@ namespace base_local_planner {
 
       double cost_; ///< @brief The cost/score of the trajectory
 
+      std::vector<double> costs_;
+
       double time_delta_; ///< @brief The time gap between points
 
       /**

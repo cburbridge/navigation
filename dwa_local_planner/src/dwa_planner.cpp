@@ -162,6 +162,9 @@ namespace dwa_local_planner {
     traj_cloud_pub_.advertise(private_nh, "trajectory_cloud", 1);
     private_nh.param("publish_traj_pc", publish_traj_pc_, false);
 
+    costs_pub_ = private_nh.advertise<std_msgs::Float64MultiArray>("sample_costs",1);
+    private_nh.param("publish_sample_costs", publish_sample_costs_, true);
+
     // set up all the cost functions that will be applied in order
     // (any function returning negative values will abort scoring, so the order can improve performance)
     std::vector<base_local_planner::TrajectoryCostFunction*> critics;
@@ -317,6 +320,38 @@ namespace dwa_local_planner {
     // find best trajectory by sampling and scoring the samples
     std::vector<base_local_planner::Trajectory> all_explored;
     scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+
+    // If publishing the individual sample critic scores...
+    if (publish_sample_costs_) {
+        std::vector< base_local_planner::Trajectory>::iterator t = all_explored.begin();
+        std_msgs::Float64MultiArray costs;
+        std_msgs::MultiArrayDimension dimension_lv;
+        dimension_lv.label="xv";
+        dimension_lv.size=1;
+        costs.layout.dim.push_back(dimension_lv);
+        std_msgs::MultiArrayDimension dimension_wv;
+        dimension_wv.label="wv";
+        dimension_wv.size=1;
+        costs.layout.dim.push_back(dimension_wv);
+        for ( std::vector<double>::iterator cost=t->costs_.begin(); cost!=t->costs_.end(); cost+=2) {
+            std_msgs::MultiArrayDimension dimension;
+            dimension.label="critic";
+            dimension.size=2;
+            costs.layout.dim.push_back(dimension);
+        }
+
+        // how many critics!?! If some critics get commented out then this hard-coding screws up.
+        int n_critics = 6; //t->costs_.size()/2;
+        costs.data.reserve((n_critics * 2 + 2 )* all_explored.size());
+        costs.layout.data_offset=0;  // !!!! Using data_offset to count number of samples!
+        for(; t != all_explored.end(); ++t) {
+            costs.data.push_back(t->xv_);
+            costs.data.push_back(t->thetav_);
+            costs.data.insert(costs.data.end(), t->costs_.begin(), t->costs_.end());
+            costs.layout.data_offset+=1;
+        }
+        costs_pub_.publish(costs);
+    }
 
     if(publish_traj_pc_)
     {

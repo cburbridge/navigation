@@ -52,25 +52,30 @@ namespace base_local_planner {
     int gen_id = 0;
     for(std::vector<TrajectoryCostFunction*>::iterator score_function = critics_.begin(); score_function != critics_.end(); ++score_function) {
       TrajectoryCostFunction* score_function_p = *score_function;
-      if (score_function_p->getScale() == 0) {
-        continue;
-      }
+      // Commented below to ensure all sampled trajectories are criticed
+      // if (score_function_p->getScale() == 0) {
+      //   continue;
+      // }
       double cost = score_function_p->scoreTrajectory(traj);
+      traj.costs_.push_back(cost);
       if (cost < 0) {
         ROS_DEBUG("Velocity %.3lf, %.3lf, %.3lf discarded by cost function  %d with cost: %f", traj.xv_, traj.yv_, traj.thetav_, gen_id, cost);
         traj_cost = cost;
-        break;
+        // Commented out below to ensure all critics are tested.
+        // break;
       }
       if (cost != 0) {
         cost *= score_function_p->getScale();
       }
+      traj.costs_.push_back(cost);
       traj_cost += cost;
-      if (best_traj_cost > 0) {
-        // since we keep adding positives, once we are worse than the best, we will stay worse
-        if (traj_cost > best_traj_cost) {
-          break;
-        }
-      }
+      // Commented out below to ensure all critics are tested.
+      // if (best_traj_cost > 0) {
+      //   // since we keep adding positives, once we are worse than the best, we will stay worse
+      //   if (traj_cost > best_traj_cost) {
+      //     break;
+      //   }
+      // }
       gen_id ++;
     }
 
@@ -102,6 +107,7 @@ namespace base_local_planner {
           // TODO use this for debugging
           continue;
         }
+        loop_traj.costs_.clear();
         loop_traj_cost = scoreTrajectory(loop_traj, best_traj_cost);
         if (all_explored != NULL) {
           loop_traj.cost_ = loop_traj_cost;
