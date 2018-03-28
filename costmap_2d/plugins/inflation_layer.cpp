@@ -150,10 +150,6 @@ void InflationLayer::updateBounds(double robot_x, double robot_y, double robot_y
     last_min_y_ = *min_y;
     last_max_x_ = *max_x;
     last_max_y_ = *max_y;
-    // We need to include in the inflation cells outside the bounding
-    // box by the amount of the cell_inflation_radius_.  Cells
-    // up to that distance outside the box can still influence the costs
-    // stored in cells inside the box.
     *min_x = std::min(tmp_min_x, *min_x) - inflation_radius_;
     *min_y = std::min(tmp_min_y, *min_y) - inflation_radius_;
     *max_x = std::max(tmp_max_x, *max_x) + inflation_radius_;
@@ -173,15 +169,14 @@ void InflationLayer::onFootprintChanged()
             layered_costmap_->getFootprint().size(), inscribed_radius_, inflation_radius_);
 }
 
-void InflationLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i,
-                                          int max_j)
+void InflationLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
   boost::unique_lock < boost::recursive_mutex > lock(*inflation_access_);
-  if (!enabled_)
+  if (!enabled_ || (cell_inflation_radius_ == 0))
     return;
 
-  // make sure the inflation queue is empty at the beginning of the cycle (should always be true)
-  ROS_ASSERT_MSG(inflation_queue_.empty(), "The inflation queue must be empty at the beginning of inflation");
+  // make sure the inflation list is empty at the beginning of the cycle (should always be true)
+  ROS_ASSERT_MSG(inflation_cells_.empty(), "The inflation list must be empty at the beginning of inflation");
 
   unsigned char* master_array = master_grid.getCharMap();
   unsigned int size_x = master_grid.getSizeInCellsX(), size_y = master_grid.getSizeInCellsY();
@@ -200,11 +195,25 @@ void InflationLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, 
   }
   memset(seen_, false, size_x * size_y * sizeof(bool));
 
+  // We need to include in the inflation cells outside the bounding
+  // box min_i...max_j, by the amount cell_inflation_radius_.  Cells
+  // up to that distance outside the box can still influence the costs
+  // stored in cells inside the box.
+  min_i -= cell_inflation_radius_;
+  min_j -= cell_inflation_radius_;
+  max_i += cell_inflation_radius_;
+  max_j += cell_inflation_radius_;
+
   min_i = std::max(0, min_i);
   min_j = std::max(0, min_j);
   max_i = std::min(int(size_x), max_i);
   max_j = std::min(int(size_y), max_j);
-  
+
+  // Inflation list; we append cells to visit in a list associated with its distance to the nearest obstacle
+  // We use a map<distance, list> to emulate the priority queue used before, with a notable performance boost
+
+  // Start with lethal obstacles: by definition distance is 0.0
+  std::vector<CellData>& obs_bin = inflation_cells_[0.0];
   for (int j = min_j; j < max_j; j++)
   {
     for (int i = min_i; i < max_i; i++)
@@ -213,39 +222,61 @@ void InflationLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, 
       unsigned char cost = master_array[index];
       if (cost == LETHAL_OBSTACLE)
       {
-        enqueue(master_array, index, i, j, i, j);
+        obs_bin.push_back(CellData(index, i, j, i, j));
       }
     }
   }
 
-  while (!inflation_queue_.empty())
+  // Process cells by increasing distance; new cells are appended to the corresponding distance bin, so they
+  // can overtake previously inserted but farther away cells
+  std::map<double, std::vector<CellData> >::iterator bin;
+  for (bin = inflation_cells_.begin(); bin != inflation_cells_.end(); ++bin)
   {
-    // get the highest priority cell and pop it off the priority queue
-    const CellData& current_cell = inflation_queue_.top();
+    for (int i = 0; i < bin->second.size(); ++i)
+    {
+      // process all cells at distance dist_bin.first
+      const CellData& cell = bin->second[i];
 
-    unsigned int index = current_cell.index_;
-    unsigned int mx = current_cell.x_;
-    unsigned int my = current_cell.y_;
-    unsigned int sx = current_cell.src_x_;
-    unsigned int sy = current_cell.src_y_;
+      unsigned int index = cell.index_;
 
-    // pop once we have our cell info
-    inflation_queue_.pop();
+      // ignore if already visited
+      if (seen_[index])
+      {
+        continue;
+      }
 
-    // attempt to put the neighbors of the current cell onto the queue
-    if (mx > 0)
-      enqueue(master_array, index - 1, mx - 1, my, sx, sy);
-    if (my > 0)
-      enqueue(master_array, index - size_x, mx, my - 1, sx, sy);
-    if (mx < size_x - 1)
-      enqueue(master_array, index + 1, mx + 1, my, sx, sy);
-    if (my < size_y - 1)
-      enqueue(master_array, index + size_x, mx, my + 1, sx, sy);
+      seen_[index] = true;
+
+      unsigned int mx = cell.x_;
+      unsigned int my = cell.y_;
+      unsigned int sx = cell.src_x_;
+      unsigned int sy = cell.src_y_;
+
+      // assign the cost associated with the distance from an obstacle to the cell
+      unsigned char cost = costLookup(mx, my, sx, sy);
+      unsigned char old_cost = master_array[index];
+      if (old_cost == NO_INFORMATION && cost >= INSCRIBED_INFLATED_OBSTACLE)
+        master_array[index] = cost;
+      else
+        master_array[index] = std::max(old_cost, cost);
+
+      // attempt to put the neighbors of the current cell onto the inflation list
+      if (mx > 0)
+        enqueue(index - 1, mx - 1, my, sx, sy);
+      if (my > 0)
+        enqueue(index - size_x, mx, my - 1, sx, sy);
+      if (mx < size_x - 1)
+        enqueue(index + 1, mx + 1, my, sx, sy);
+      if (my < size_y - 1)
+        enqueue(index + size_x, mx, my + 1, sx, sy);
+    }
   }
+
+  inflation_cells_.clear();
 }
 
 /**
- * @brief  Given an index of a cell in the costmap, place it into a priority queue for obstacle inflation
+ * @brief  Given an index of a cell in the costmap, place it into a list pending for obstacle inflation
  * @param  grid The costmap
  * @param  index The index of the cell
  * @param  mx The x coordinate of the cell (can be computed from the index, but saves time to store it)
@@ -253,31 +284,20 @@ void InflationLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, 
  * @param  src_x The x index of the obstacle point inflation started at
  * @param  src_y The y index of the obstacle point inflation started at
  */
-inline void InflationLayer::enqueue(unsigned char* grid, unsigned int index, unsigned int mx, unsigned int my,
-                                            unsigned int src_x, unsigned int src_y)
+inline void InflationLayer::enqueue(unsigned int index, unsigned int mx, unsigned int my,
+                                    unsigned int src_x, unsigned int src_y)
 {
-  // set the cost of the cell being inserted
   if (!seen_[index])
   {
     // we compute our distance table one cell further than the inflation radius dictates so we can make the check below
     double distance = distanceLookup(mx, my, src_x, src_y);
 
-    // we only want to put the cell in the queue if it is within the inflation radius of the obstacle point
+    // we only want to put the cell in the list if it is within the inflation radius of the obstacle point
     if (distance > cell_inflation_radius_)
       return;
 
-    // assign the cost associated with the distance from an obstacle to the cell
-    unsigned char cost = costLookup(mx, my, src_x, src_y);
-    unsigned char old_cost = grid[index];
-
-    if (old_cost == NO_INFORMATION && cost >= INSCRIBED_INFLATED_OBSTACLE)
-      grid[index] = cost;
-    else
-      grid[index] = std::max(old_cost, cost);
-    // push the cell data onto the queue and mark
-    seen_[index] = true;
-    CellData data(distance, index, mx, my, src_x, src_y);
-    inflation_queue_.push(data);
+    // push the cell data onto the inflation list and mark
+    inflation_cells_[distance].push_back(CellData(index, mx, my, src_x, src_y));
   }
 }
 

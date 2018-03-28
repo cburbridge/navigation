@@ -2,6 +2,68 @@
 Changelog for package costmap_2d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.15 (2018-03-20)
+--------------------
+* Merge pull request `#671 <https://github.com/ros-planning/navigation/issues/671>`_ from ros-planning/email_update_indigo
+  update maintainer email (indigo)
+* fix 'enable' for static_layer with rolling window (`#659 <https://github.com/ros-planning/navigation/issues/659>`_) (`#664 <https://github.com/ros-planning/navigation/issues/664>`_)
+* Merge pull request `#647 <https://github.com/ros-planning/navigation/issues/647>`_ from aaronhoy/indigo_add_ahoy
+  Add myself as a maintainer.
+* Contributors: Aaron Hoy, Jannik Abbenseth, Michael Ferguson
+
+1.12.14 (2017-12-19)
+--------------------
+* don't update costs if inflation radius is zero
+* Speedup (~60%) inflation layer update (`#525 <https://github.com/ros-planning/navigation/issues/525>`_)
+* Fix CMakeLists + package.xmls (`#548 <https://github.com/ros-planning/navigation/issues/548>`_)
+* Contributors: Jorge Santos Simón, Martin Günther, Michael Ferguson
+
+1.12.13 (2016-08-15)
+--------------------
+* Fixed race condition with costmaps
+  Modifying minx\_, miny\_,, maxx\_, and maxy\_ without locking the mutex is
+  unsafe and is a race condition if updateMap is called from multiple
+  threads.
+* Contributors: Alex Henning
+
+1.12.12 (2016-06-24)
+--------------------
+* Fixed sign error in inflation layer
+* Adds warning when a layer shrinks the bounds
+* Contributors: Alex Henning
+
+1.12.11 (2016-06-08)
+--------------------
+* Fixed bug with inflation layer that caused underinflation
+  When marking before adding to the priority queue, it was possible to
+  underestimate the cost of a cell. This is both dangerous and can lead to
+  unintended side-effects with navigation.
+* Fixed bug with artifacts when not current
+  This is due to not getting clearing observations if the marking
+  observations aren't current.
+* Fix bug with inflation artifacts being left behind
+* Contributors: Alex Henning
+
+1.12.10 (2016-05-27)
+--------------------
+* Fixes issue with costmaps shearing
+* Contributors: Alex Henning
+
+1.12.9 (2016-05-26)
+-------------------
+* Made costmap publishing truly lazy
+* Contributors: Alex Henning
+
+1.12.8 (2016-05-16)
+-------------------
+* fix resource locations to fix tests
+* Fix bug with resetting static layer
+* Made update map threadsafe
+* Reordered initializer list to match order of declarations.
+* Parametrize movementCB timer's period
+* No more ghosts in the inflation layer
+* Contributors: Alex Henning, Daniel Stonier, Michael Ferguson, Spyros Maniatopoulos
+
 1.12.7 (2016-01-05)
 -------------------
 * Fix inflation layer locking

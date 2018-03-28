@@ -3,7 +3,10 @@ project(amcl)
 
 find_package(catkin REQUIRED
         COMPONENTS
+            message_filters
+            rosbag
             roscpp
+            std_srvs
             tf
             dynamic_reconfigure
             nav_msgs
@@ -18,14 +21,16 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
     CATKIN_DEPENDS
+        rosbag
         roscpp
         dynamic_reconfigure
         tf
+  CATKIN_DEPENDS nav_msgs std_srvs
   INCLUDE_DIRS include
   LIBRARIES amcl_sensors amcl_map amcl_pf
 )
 
-include_directories(include/amcl include/amcl/map include/amcl/sensors include/amcl/pf)
+include_directories(include)
 include_directories(${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(amcl_pf
@@ -52,7 +57,7 @@ target_link_libraries(amcl_sensors amcl_map amcl_pf)
 
 add_executable(amcl
                        src/amcl_node.cpp)
-add_dependencies(amcl amcl_gencfg)
+add_dependencies(amcl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(amcl
     amcl_sensors amcl_map amcl_pf
@@ -121,6 +126,7 @@ if(CATKIN_ENABLE_TESTING)
 
   # Tests
   add_rostest(test/set_initial_pose.xml)
+  add_rostest(test/set_initial_pose_delayed.xml)
   add_rostest(test/basic_localization_stage.xml)
   add_rostest(test/small_loop_prf.xml)
   add_rostest(test/small_loop_crazy_driving_prg.xml)

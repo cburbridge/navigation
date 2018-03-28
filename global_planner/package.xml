@@ -1,10 +1,9 @@
 <package>
   <name>global_planner</name>
-  <version>1.12.7</version>
+  <version>1.12.15</version>
   <description>
      A path planner library and node.
   </description>
-  <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
   <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
   <license>BSD</license>
 

@@ -5,7 +5,7 @@ A 2D navigation stack that takes in information from odometry, sensor
 streams, and a goal pose and outputs safe velocity commands that are sent
 to a mobile base.
 
- * Devel Job Status: [![Devel Job Status](https://lcas.lincoln.ac.uk/jenkins/buildStatus/icon?job=devel-indigo-navigation_strands_fork)](https://lcas.lincoln.ac.uk/jenkins/job/devel-indigo-navigation_strands_fork/)
+ * Devel Job Status: [![Devel Job Status](https://lcas.lincoln.ac.uk/buildfarm/buildStatus/icon?job=devel-indigo-navigation_strands_fork)](https://lcas.lincoln.ac.uk/jenkins/job/devel-indigo-navigation_strands_fork/)
 
 Related stacks:
 

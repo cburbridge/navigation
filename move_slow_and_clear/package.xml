@@ -1,6 +1,6 @@
 <package>
     <name>move_slow_and_clear</name>
-    <version>1.12.7</version>
+    <version>1.12.15</version>
     <description>
 
         move_slow_and_clear
@@ -8,7 +8,6 @@
     </description>
     <author>Eitan Marder-Eppstein</author>
     <author>contradict@gmail.com</author>
-    <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
     <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
     <license>BSD</license>
     <url>http://wiki.ros.org/move_slow_and_clear</url>
