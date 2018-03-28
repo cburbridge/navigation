@@ -105,6 +105,10 @@ void StaticLayer::onInitialize()
 
     }
   }
+  else
+  {
+    has_updated_data_ = true;
+  }
 
   if (dsrv_)
   {
@@ -287,6 +291,9 @@ void StaticLayer::updateBounds(double robot_x, double robot_y, double robot_yaw,
 void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
   if (!map_received_)
+    return;
+
+  if (!enabled_)
     return;
 
   if (!layered_costmap_->isRolling())
