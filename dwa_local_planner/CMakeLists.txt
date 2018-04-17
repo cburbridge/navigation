@@ -17,11 +17,15 @@ find_package(catkin REQUIRED
 
 find_package(Eigen REQUIRED)
 find_package(PCL REQUIRED)
+find_package(base_local_planner REQUIRED) # not required because the find_package ... REQUIRED....?
+
+
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${EIGEN_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
+    ${base_local_planner_INCLUDE_DIRS}
     )
 add_definitions(${EIGEN_DEFINITIONS})
 
@@ -41,7 +45,11 @@ catkin_package(
         roscpp
 )
 
-add_library(dwa_local_planner src/dwa_planner.cpp src/dwa_planner_ros.cpp)
+add_library(
+    dwa_local_planner src/velocity_costmaps_cost_function.cpp  src/dwa_planner.cpp src/dwa_planner_ros.cpp
+    )
+
+
 target_link_libraries(dwa_local_planner ${catkin_LIBRARIES})
 add_dependencies(dwa_local_planner dwa_local_planner_gencfg)
 add_dependencies(dwa_local_planner nav_msgs_gencpp)

@@ -2,6 +2,12 @@
 Changelog for package dwa_local_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+1.12.8 (2018-04-10)
+------------------
+* MFC: Removed all navigation stack to expose only dwa based plugin
+
+
 1.12.7 (2016-01-05)
 -------------------
 

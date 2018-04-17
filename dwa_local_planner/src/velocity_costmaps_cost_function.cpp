@@ -1,11 +1,12 @@
-#include <base_local_planner/velocity_costmaps_cost_function.h>
+#include <dwa_local_planner/velocity_costmaps_cost_function.h>
+
 #include <cmath>
 #include <Eigen/Core>
 #include <ros/console.h>
 
 using base_local_planner::Trajectory;
 
-namespace base_local_planner {
+namespace dwa_local_planner {
 
 VelocityCostmapsCostFunction::VelocityCostmapsCostFunction() {
     costs_xv_ = 0.0;
@@ -16,6 +17,9 @@ VelocityCostmapsCostFunction::VelocityCostmapsCostFunction() {
     nh.param("velocity_costmap_topic", topic, topic);
     sub = nh.subscribe(topic, 10, &VelocityCostmapsCostFunction::callback, this);
     pub = nh.advertise<nav_msgs::OccupancyGrid>("velocity_costmap", 10);
+
+    //ROS_INFO("We're in namespace: %s", nh.getNamespace().c_str());
+    
 }
 
 VelocityCostmapsCostFunction::~VelocityCostmapsCostFunction() {}
@@ -28,7 +32,7 @@ bool VelocityCostmapsCostFunction::prepare() {
     return true;
 }
 
-double VelocityCostmapsCostFunction::scoreTrajectory(Trajectory &traj) {
+double VelocityCostmapsCostFunction::scoreTrajectory(base_local_planner::Trajectory &traj) {
 //    ROS_INFO("VELMAPS");
     boost::mutex::scoped_lock lock(mutex);
     double cost = 0;

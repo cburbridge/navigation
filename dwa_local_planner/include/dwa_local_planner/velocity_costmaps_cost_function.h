@@ -10,21 +10,21 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <boost/thread/mutex.hpp>
 
-namespace base_local_planner {
+namespace dwa_local_planner {
 
 /**
  * class ObstacleCostFunction
  * @brief Uses costmap 2d to assign negative costs if robot footprint
  * is in obstacle on any point of the trajectory.
  */
-class VelocityCostmapsCostFunction : public TrajectoryCostFunction {
+class VelocityCostmapsCostFunction : public base_local_planner::TrajectoryCostFunction {
 
 public:
   VelocityCostmapsCostFunction();
   ~VelocityCostmapsCostFunction();
 
   bool prepare();
-  double scoreTrajectory(Trajectory &traj);
+  double scoreTrajectory(base_local_planner::Trajectory &traj);
 
   void setParams(double max_vel_x) {
       max_vel_x_ = max_vel_x;
