@@ -1,5 +1,5 @@
 <package>
-    <name>dwa_local_planner</name>
+    <name>dwa_local_planner_constraint</name>
     <version>1.12.7</version>
     <description>
 
@@ -18,7 +18,7 @@
     <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
     <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
     <license>BSD</license>
-    <url>http://wiki.ros.org/dwa_local_planner</url>
+    <url>http://wiki.ros.org/dwa_local_planner_constraint</url>
 
     <buildtool_depend>catkin</buildtool_depend>
 

@@ -41,8 +41,8 @@
 #include <Eigen/Core>
 
 
-#include <dwa_local_planner/DWAPlannerConfig.h>
-#include <dwa_local_planner/velocity_costmaps_cost_function.h>
+#include <dwa_local_planner_constraint/DWAPlannerConfig.h>
+#include <dwa_local_planner_constraint/velocity_costmaps_cost_function.h>
 
 //for creating a local cost grid
 #include <base_local_planner/map_grid_visualizer.h>
@@ -63,7 +63,7 @@
 
 #include <nav_msgs/Path.h>
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
   /**
    * @class DWAPlanner
    * @brief A class implementing a local planner using the Dynamic Window Approach

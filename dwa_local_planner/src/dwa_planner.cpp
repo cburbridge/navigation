@@ -34,7 +34,7 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#include <dwa_local_planner/dwa_planner.h>
+#include <dwa_local_planner_constraint/dwa_planner.h>
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
 #include <cmath>
@@ -48,7 +48,7 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
   void DWAPlanner::reconfigure(DWAPlannerConfig &config)
   {
 

@@ -10,7 +10,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <boost/thread/mutex.hpp>
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
 
 /**
  * class ObstacleCostFunction

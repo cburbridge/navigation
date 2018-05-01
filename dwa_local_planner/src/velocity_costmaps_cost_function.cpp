@@ -1,4 +1,4 @@
-#include <dwa_local_planner/velocity_costmaps_cost_function.h>
+#include <dwa_local_planner_constraint/velocity_costmaps_cost_function.h>
 
 #include <cmath>
 #include <Eigen/Core>
@@ -6,7 +6,7 @@
 
 using base_local_planner::Trajectory;
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
 
 VelocityCostmapsCostFunction::VelocityCostmapsCostFunction() {
     costs_xv_ = 0.0;

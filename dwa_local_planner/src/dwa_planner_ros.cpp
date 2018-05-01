@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 
-#include <dwa_local_planner/dwa_planner_ros.h>
+#include <dwa_local_planner_constraint/dwa_planner_ros.h>
 #include <Eigen/Core>
 #include <cmath>
 
@@ -47,9 +47,9 @@
 #include <nav_msgs/Path.h>
 
 //register this planner as a BaseLocalPlanner plugin
-PLUGINLIB_EXPORT_CLASS(dwa_local_planner::DWAPlannerROS, nav_core::BaseLocalPlanner)
+PLUGINLIB_EXPORT_CLASS(dwa_local_planner_constraint::DWAPlannerROS, nav_core::BaseLocalPlanner)
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
 
   void DWAPlannerROS::reconfigureCB(DWAPlannerConfig &config, uint32_t level) {
       if (setup_ && config.restore_defaults) {
@@ -214,14 +214,14 @@ namespace dwa_local_planner {
     //if we cannot move... tell someone
     std::vector<geometry_msgs::PoseStamped> local_plan;
     if(path.cost_ < 0) {
-      ROS_DEBUG_NAMED("dwa_local_planner",
+      ROS_DEBUG_NAMED("dwa_local_planner_constraint",
           "The dwa local planner failed to find a valid plan, cost functions discarded all candidates. This can mean there is an obstacle too close to the robot.");
       local_plan.clear();
       publishLocalPlan(local_plan);
       return false;
     }
 
-    ROS_DEBUG_NAMED("dwa_local_planner", "A valid velocity command of (%.2f, %.2f, %.2f) was found for this cycle.", 
+    ROS_DEBUG_NAMED("dwa_local_planner_constraint", "A valid velocity command of (%.2f, %.2f, %.2f) was found for this cycle.", 
                     cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z);
 
     // Fill out the local plan
@@ -263,10 +263,10 @@ namespace dwa_local_planner {
 
     //if the global plan passed in is empty... we won't do anything
     if(transformed_plan.empty()) {
-      ROS_WARN_NAMED("dwa_local_planner", "Received an empty transformed plan.");
+      ROS_WARN_NAMED("dwa_local_planner_constraint", "Received an empty transformed plan.");
       return false;
     }
-    ROS_DEBUG_NAMED("dwa_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
+    ROS_DEBUG_NAMED("dwa_local_planner_constraint", "Received a transformed plan with %zu points.", transformed_plan.size());
 
     // update plan in dwa_planner even if we just stop and rotate, to allow checkTrajectory
     dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
@@ -291,7 +291,7 @@ namespace dwa_local_planner {
       if (isOk) {
         publishGlobalPlan(transformed_plan);
       } else {
-        ROS_WARN_NAMED("dwa_local_planner", "DWA planner failed to produce path.");
+        ROS_WARN_NAMED("dwa_local_planner_constraint", "DWA planner failed to produce path.");
         std::vector<geometry_msgs::PoseStamped> empty_plan;
         publishGlobalPlan(empty_plan);
       }

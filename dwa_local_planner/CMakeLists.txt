@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(dwa_local_planner)
+project(dwa_local_planner_constraint)
 
 find_package(catkin REQUIRED
         COMPONENTS
@@ -38,7 +38,7 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES dwa_local_planner
+    LIBRARIES dwa_local_planner_constraint
     CATKIN_DEPENDS
         dynamic_reconfigure
         pluginlib
@@ -46,15 +46,15 @@ catkin_package(
 )
 
 add_library(
-    dwa_local_planner src/velocity_costmaps_cost_function.cpp  src/dwa_planner.cpp src/dwa_planner_ros.cpp
+    dwa_local_planner_constraint src/velocity_costmaps_cost_function.cpp  src/dwa_planner.cpp src/dwa_planner_ros.cpp
     )
 
 
-target_link_libraries(dwa_local_planner ${catkin_LIBRARIES})
-add_dependencies(dwa_local_planner dwa_local_planner_gencfg)
-add_dependencies(dwa_local_planner nav_msgs_gencpp)
+target_link_libraries(dwa_local_planner_constraint ${catkin_LIBRARIES})
+add_dependencies(dwa_local_planner_constraint dwa_local_planner_constraint_gencfg)
+add_dependencies(dwa_local_planner_constraint nav_msgs_gencpp)
 
-install(TARGETS dwa_local_planner
+install(TARGETS dwa_local_planner_constraint
        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
        )

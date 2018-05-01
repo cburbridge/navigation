@@ -43,7 +43,7 @@
 #include <tf/transform_listener.h>
 
 #include <dynamic_reconfigure/server.h>
-#include <dwa_local_planner/DWAPlannerConfig.h>
+#include <dwa_local_planner_constraint/DWAPlannerConfig.h>
 
 #include <angles/angles.h>
 
@@ -55,9 +55,9 @@
 
 #include <base_local_planner/odometry_helper_ros.h>
 
-#include <dwa_local_planner/dwa_planner.h>
+#include <dwa_local_planner_constraint/dwa_planner.h>
 
-namespace dwa_local_planner {
+namespace dwa_local_planner_constraint {
   /**
    * @class DWAPlannerROS
    * @brief ROS Wrapper for the DWAPlanner that adheres to the
@@ -142,7 +142,7 @@ namespace dwa_local_planner {
       costmap_2d::Costmap2DROS* costmap_ros_;
 
       dynamic_reconfigure::Server<DWAPlannerConfig> *dsrv_;
-      dwa_local_planner::DWAPlannerConfig default_config_;
+      dwa_local_planner_constraint::DWAPlannerConfig default_config_;
       bool setup_;
       tf::Stamped<tf::Pose> current_pose_;
 
