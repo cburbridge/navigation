@@ -17,8 +17,8 @@ Changelog for package dwa_local_planner_constraint
 1.12.5 (2015-10-29)
 -------------------
 
-Forthcoming
------------
+2.0.0 (2018-05-01)
+------------------
 * removed duplicate
 * more renames due to new package name
 * Contributors: Marc Hanheide
