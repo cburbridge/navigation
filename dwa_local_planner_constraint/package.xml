@@ -16,7 +16,6 @@
     <author>Eitan Marder-Eppstein</author>
     <author>contradict@gmail.com</author>
     <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
-    <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
     <license>BSD</license>
     <url>http://wiki.ros.org/dwa_local_planner_constraint</url>
 
